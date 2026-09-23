@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แฟลชการ์ดจีน · อารมณ์เศร้า</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#0b1020;
+    --bg2:#1a1030;
+    --bg3:#0e1b2a;
+    --ink:#e7e3f5;
+    --muted:#9a93b8;
+    --accent:#8ea9db;
+    --accent2:#c9a7d8;
+    --glass:rgba(255,255,255,.06);
+    --line:rgba(255,255,255,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Noto Sans Thai',system-ui,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3),#120c22);
+    background-size:400% 400%;
+    animation:drift 26s ease infinite;
+    display:flex;flex-direction:column;align-items:center;
+    padding:26px 16px 40px;overflow-x:hidden;
+  }
+  @keyframes drift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+  /* ---------- อนุภาคลอย ---------- */
+  #sky{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .dust{
+    position:absolute;bottom:-12vh;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, #ffffff, rgba(200,190,255,.15));
+    opacity:.35;filter:blur(.4px);
+    animation:float linear infinite;
+  }
+  @keyframes float{
+    0%{transform:translateY(0) translateX(0) scale(1);opacity:0}
+    10%{opacity:.5}
+    50%{transform:translateY(-55vh) translateX(28px) scale(1.15)}
+    90%{opacity:.35}
+    100%{transform:translateY(-115vh) translateX(-24px) scale(.7);opacity:0}
+  }
+  .rain{
+    position:absolute;top:-20%;width:1px;height:70px;
+    background:linear-gradient(transparent,rgba(174,196,255,.45),transparent);
+    animation:fall linear infinite;opacity:.35;
+  }
+  @keyframes fall{0%{transform:translateY(-20vh)}100%{transform:translateY(125vh)}}
+
+  /* ---------- หัวเรื่อง ---------- */
+  header{position:relative;z-index:2;text-align:center;margin-bottom:18px}
+  h1{font-weight:600;font-size:1.5rem;letter-spacing:.5px;
+     background:linear-gradient(90deg,var(--accent),var(--accent2));
+     -webkit-background-clip:text;background-clip:text;color:transparent}
+  header p{color:var(--muted);font-size:.85rem;margin-top:6px;font-weight:300}
+
+  /* ---------- การ์ด ---------- */
+  .stage{position:relative;z-index:2;width:min(92vw,430px);height:300px;perspective:1400px;margin:8px 0 20px;
+         animation:hover 6s ease-in-out infinite}
+  @keyframes hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+  .card{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+        transition:transform .75s cubic-bezier(.2,.8,.25,1);cursor:pointer}
+  .card.flip{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;
+    background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));
+    border:1px solid var(--line);
+    box-shadow:0 22px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter:blur(14px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:24px;text-align:center;
+  }
+  .back{transform:rotateY(180deg);
+    background:linear-gradient(160deg,rgba(201,167,216,.14),rgba(142,169,219,.07));}
+  .pinyin{font-size:2.6rem;font-weight:600;letter-spacing:1px;color:#dfe6ff;
+          text-shadow:0 0 26px rgba(142,169,219,.45)}
+  .hanzi{font-family:'Noto Serif SC',serif;font-size:3rem;font-weight:600;color:#fff;
+         text-shadow:0 0 30px rgba(201,167,216,.5)}
+  .pinyin-sm{color:var(--accent);font-size:1.05rem;margin-top:8px;letter-spacing:.5px}
+  .thai{color:#efeaff;font-size:1.05rem;margin-top:14px;line-height:1.7;font-weight:300;
+        border-top:1px solid var(--line);padding-top:12px;width:100%}
+  .hint{position:absolute;bottom:14px;font-size:.72rem;color:var(--muted);font-weight:300;letter-spacing:.4px}
+
+  .speak{
+    margin-top:22px;display:inline-flex;align-items:center;gap:8px;
+    border:1px solid var(--line);background:var(--glass);color:var(--ink);
+    padding:10px 20px;border-radius:999px;cursor:pointer;font-family:inherit;font-size:.9rem;
+    transition:.25s;
+  }
+  .speak:hover{background:rgba(142,169,219,.22);transform:translateY(-2px)}
+  .speak.on{animation:pulse 1s ease infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(142,169,219,.5)}50%{box-shadow:0 0 0 12px rgba(142,169,219,0)}}
+
+  /* ---------- ปุ่มควบคุม ---------- */
+  .controls{position:relative;z-index:2;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  button.ctl{
+    border:1px solid var(--line);background:var(--glass);color:var(--ink);
+    padding:11px 18px;border-radius:14px;cursor:pointer;font-family:inherit;font-size:.88rem;
+    transition:.22s;backdrop-filter:blur(8px)
+  }
+  button.ctl:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
+  button.ctl.active{background:rgba(201,167,216,.25);border-color:var(--accent2)}
+
+  .bar{position:relative;z-index:2;width:min(92vw,430px);height:5px;border-radius:99px;
+       background:rgba(255,255,255,.1);margin:18px 0 10px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;
+         background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease}
+  .count{position:relative;z-index:2;color:var(--muted);font-size:.82rem;font-weight:300}
+
+  /* ---------- รายการคำศัพท์ ---------- */
+  details{position:relative;z-index:2;width:min(92vw,560px);margin-top:26px;
+          background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:14px 18px;backdrop-filter:blur(8px)}
+  summary{cursor:pointer;color:var(--accent);font-size:.9rem}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem;font-weight:300}
+  td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.07)}
+  td:first-child{font-family:'Noto Serif SC',serif;font-size:1.05rem;white-space:nowrap}
+  td:nth-child(2){color:var(--accent);white-space:nowrap}
+  tr{cursor:pointer;transition:.2s}
+  tr:hover{background:rgba(255,255,255,.06)}
+  footer{position:relative;z-index:2;margin-top:26px;color:var(--muted);font-size:.72rem;font-weight:300;text-align:center}
+</style>
+</head>
+<body>
+<div id="sky"></div>
+
+<header>
+  <h1>词语 · แฟลชการ์ดคำศัพท์จีน</h1>
+  <p>แตะการ์ดเพื่อพลิก · ฟังเสียงได้ทั้งสองด้าน</p>
+</header>
+
+<div class="stage">
+  <div class="card" id="card">
+    <div class="face front">
+      <div class="pinyin" id="fPinyin">bàodá</div>
+      <button class="speak" id="fSpeak">🔊 ฟังเสียง</button>
+      <div class="hint">แตะเพื่อดูคำศัพท์และคำแปล</div>
+    </div>
+    <div class="face back">
+      <div class="hanzi" id="bHanzi">报答</div>
+      <div class="pinyin-sm" id="bPinyin">bàodá</div>
+      <div class="thai" id="bThai">ตอบแทน, ชดใช้</div>
+      <button class="speak" id="bSpeak">🔊 ฟังอีกครั้ง</button>
+    </div>
+  </div>
+</div>
+
+<div class="bar"><i id="bar"></i></div>
+<div class="count" id="count">1 / 15</div>
+
+<div class="controls" style="margin-top:16px">
+  <button class="ctl" id="prev">← ก่อนหน้า</button>
+  <button class="ctl" id="flip">พลิกการ์ด</button>
+  <button class="ctl" id="next">ถัดไป →</button>
+  <button class="ctl" id="shuffle">🔀 สุ่ม</button>
+  <button class="ctl" id="auto">🔈 ออโต้เสียง</button>
+</div>
+
+<details>
+  <summary>ดูรายการคำศัพท์ทั้งหมด (15 คำ)</summary>
+  <table id="list"></table>
+</details>
+
+<footer>ใช้เสียงอ่านจากระบบของเครื่อง · แนะนำ Chrome / Edge / Safari</footer>
+
+<script>
+const DATA = [
+  {h:"报答", p:"bàodá", t:"ตอบแทน, ชดใช้"},
+  {h:"强健", p:"qiángjiàn", t:"แข็งแรง, แข็งแกร่ง (ร่างกาย)"},
+  {h:"破烂不堪", p:"pòlànbùkān", t:"บุบสลาย, เปื่อยยุ่ย"},
+  {h:"索取", p:"suǒqǔ", t:"เรียกเอา, ขอ (เอา)"},
+  {h:"抚慰", p:"fǔwèi", t:"แสดงความเสียใจและปลอบขวัญ"},
+  {h:"酸楚", p:"suānchǔ", t:"ปวดร้าว ระทมทุกข์"},
+  {h:"虚荣心", p:"xūróngxīn", t:"จิตใจที่ฟุ้งเฟ้อ อยากมีหน้ามีตา"},
+  {h:"忍受", p:"rěnshòu", t:"อดทน"},
+  {h:"悲哀", p:"bēi'āi", t:"เศร้าอาดูร"},
+  {h:"后悔", p:"hòuhuǐ", t:"เศร้า, เสียใจในภายหลัง"},
+  {h:"即兴", p:"jíxìng", t:"เกิดอารมณ์, เกิดแรงบันดาลใจ"},
+  {h:"悲伤", p:"bēishāng", t:"เศร้า, โศกเศร้า"},
+  {h:"回报", p:"huíbào", t:"ตอบแทน (ผลลัพธ์, สังคม)"},
+  {h:"乞丐", p:"qǐgài", t:"ขอทาน"},
+  {h:"自恋", p:"zìliàn", t:"หลงตัวเอง"}
+];
+
+let order = DATA.map((_,i)=>i);
+let idx = 0, autoSpeak = true;
+
+const card=document.getElementById('card');
+const fP=document.getElementById('fPinyin');
+const bH=document.getElementById('bHanzi'), bP=document.getElementById('bPinyin'), bT=document.getElementById('bThai');
+const bar=document.getElementById('bar'), count=document.getElementById('count');
+
+/* ---------- เสียงอ่าน ---------- */
+let zhVoice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  zhVoice = vs.find(v=>/zh[-_]CN/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang)) || null;
+}
+pickVoice();
+speechSynthesis.onvoiceschanged = pickVoice;
+
+function speak(btn){
+  const text = DATA[order[idx]].h;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='zh-CN'; u.rate=0.75; u.pitch=1;
+    if(zhVoice) u.voice=zhVoice;
+    if(btn){ btn.classList.add('on'); u.onend=()=>btn.classList.remove('on'); u.onerror=()=>btn.classList.remove('on'); }
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- แสดงผล ---------- */
+function render(auto=false){
+  const d = DATA[order[idx]];
+  fP.textContent = d.p;
+  bH.textContent = d.h; bP.textContent = d.p; bT.textContent = d.t;
+  count.textContent = (idx+1)+' / '+DATA.length;
+  bar.style.width = ((idx+1)/DATA.length*100)+'%';
+  if(auto && autoSpeak) setTimeout(()=>speak(document.getElementById('fSpeak')), 350);
+}
+function go(step){
+  card.classList.remove('flip');
+  setTimeout(()=>{ idx=(idx+step+DATA.length)%DATA.length; render(true); },180);
+}
+
+card.addEventListener('click', e=>{
+  if(e.target.classList.contains('speak')) return;
+  card.classList.toggle('flip');
+});
+document.getElementById('fSpeak').onclick = e=>{e.stopPropagation();speak(e.currentTarget)};
+document.getElementById('bSpeak').onclick = e=>{e.stopPropagation();speak(e.currentTarget)};
+document.getElementById('prev').onclick = ()=>go(-1);
+document.getElementById('next').onclick = ()=>go(1);
+document.getElementById('flip').onclick = ()=>card.classList.toggle('flip');
+document.getElementById('shuffle').onclick = ()=>{
+  for(let i=order.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[order[i],order[j]]=[order[j],order[i]];}
+  idx=0; card.classList.remove('flip'); render(true);
+};
+const autoBtn=document.getElementById('auto');
+autoBtn.classList.add('active');
+autoBtn.onclick = ()=>{ autoSpeak=!autoSpeak; autoBtn.classList.toggle('active',autoSpeak); };
+
+document.addEventListener('keydown',```html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แฟลชการ์ดจีน · อารมณ์เศร้า</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#0b1020;
+    --bg2:#1a1030;
+    --bg3:#0e1b2a;
+    --ink:#e7e3f5;
+    --muted:#9a93b8;
+    --accent:#8ea9db;
+    --accent2:#c9a7d8;
+    --glass:rgba(255,255,255,.06);
+    --line:rgba(255,255,255,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Noto Sans Thai',system-ui,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3),#120c22);
+    background-size:400% 400%;
+    animation:drift 26s ease infinite;
+    display:flex;flex-direction:column;align-items:center;
+    padding:26px 16px 40px;overflow-x:hidden;
+  }
+  @keyframes drift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+  /* ---------- อนุภาคลอย ---------- */
+  #sky{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .dust{
+    position:absolute;bottom:-12vh;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, #ffffff, rgba(200,190,255,.15));
+    opacity:.35;filter:blur(.4px);
+    animation:float linear infinite;
+  }
+  @keyframes float{
+    0%{transform:translateY(0) translateX(0) scale(1);opacity:0}
+    10%{opacity:.5}
+    50%{transform:translateY(-55vh) translateX(28px) scale(1.15)}
+    90%{opacity:.35}
+    100%{transform:translateY(-115vh) translateX(-24px) scale(.7);opacity:0}
+  }
+  .rain{
+    position:absolute;top:-20%;width:1px;height:70px;
+    background:linear-gradient(transparent,rgba(174,196,255,.45),transparent);
+    animation:fall linear infinite;opacity:.35;
+  }
+  @keyframes fall{0%{transform:translateY(-20vh)}100%{transform:translateY(125vh)}}
+
+  /* ---------- หัวเรื่อง ---------- */
+  header{position:relative;z-index:2;text-align:center;margin-bottom:18px}
+  h1{font-weight:600;font-size:1.5rem;letter-spacing:.5px;
+     background:linear-gradient(90deg,var(--accent),var(--accent2));
+     -webkit-background-clip:text;background-clip:text;color:transparent}
+  header p{color:var(--muted);font-size:.85rem;margin-top:6px;font-weight:300}
+
+  /* ---------- การ์ด ---------- */
+  .stage{position:relative;z-index:2;width:min(92vw,430px);height:300px;perspective:1400px;margin:8px 0 20px;
+         animation:hover 6s ease-in-out infinite}
+  @keyframes hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+  .card{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+        transition:transform .75s cubic-bezier(.2,.8,.25,1);cursor:pointer}
+  .card.flip{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;
+    background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));
+    border:1px solid var(--line);
+    box-shadow:0 22px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter:blur(14px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:24px;text-align:center;
+  }
+  .back{transform:rotateY(180deg);
+    background:linear-gradient(160deg,rgba(201,167,216,.14),rgba(142,169,219,.07));}
+  .pinyin{font-size:2.6rem;font-weight:600;letter-spacing:1px;color:#dfe6ff;
+          text-shadow:0 0 26px rgba(142,169,219,.45)}
+  .hanzi{font-family:'Noto Serif SC',serif;font-size:3rem;font-weight:600;color:#fff;
+         text-shadow:0 0 30px rgba(201,167,216,.5)}
+  .pinyin-sm{color:var(--accent);font-size:1.05rem;margin-top:8px;letter-spacing:.5px}
+  .thai{color:#efeaff;font-size:1.05rem;margin-top:14px;line-height:1.7;font-weight:300;
+        border-top:1px solid var(--line);padding-top:12px;width:100%}
+  .hint{position:absolute;bottom:14px;font-size:.72rem;color:var(--muted);font-weight:300;letter-spacing:.4px}
+
+  .speak{
+    margin-top:22px;display:inline-flex;align-items:center;gap:8px;
+    border:1px solid var(--line);background:var(--glass);color:var(--ink);
+    padding:10px 20px;border-radius:999px;cursor:pointer;font-family:inherit;font-size:.9rem;
+    transition:.25s;
+  }
+  .speak:hover{background:rgba(142,169,219,.22);transform:translateY(-2px)}
+  .speak.on{animation:pulse 1s ease infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(142,169,219,.5)}50%{box-shadow:0 0 0 12px rgba(142,169,219,0)}}
+
+  /* ---------- ปุ่มควบคุม ---------- */
+  .controls{position:relative;z-index:2;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  button.ctl{
+    border:1px solid var(--line);background:var(--glass);color:var(--ink);
+    padding:11px 18px;border-radius:14px;cursor:pointer;font-family:inherit;font-size:.88rem;
+    transition:.22s;backdrop-filter:blur(8px)
+  }
+  button.ctl:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
+  button.ctl.active{background:rgba(201,167,216,.25);border-color:var(--accent2)}
+
+  .bar{position:relative;z-index:2;width:min(92vw,430px);height:5px;border-radius:99px;
+       background:rgba(255,255,255,.1);margin:18px 0 10px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;
+         background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease}
+  .count{position:relative;z-index:2;color:var(--muted);font-size:.82rem;font-weight:300}
+
+  /* ---------- รายการคำศัพท์ ---------- */
+  details{position:relative;z-index:2;width:min(92vw,560px);margin-top:26px;
+          background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:14px 18px;backdrop-filter:blur(8px)}
+  summary{cursor:pointer;color:var(--accent);font-size:.9rem}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem;font-weight:300}
+  td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.07)}
+  td:first-child{font-family:'Noto Serif SC',serif;font-size:1.05rem;white-space:nowrap}
+  td:nth-child(2){color:var(--accent);white-space:nowrap}
+  tr{cursor:pointer;transition:.2s}
+  tr:hover{background:rgba(255,255,255,.06)}
+  footer{position:relative;z-index:2;margin-top:26px;color:var(--muted);font-size:.72rem;font-weight:300;text-align:center}
+</style>
+</head>
+<body>
+<div id="sky"></div>
+
+<header>
+  <h1>词语 · แฟลชการ์ดคำศัพท์จีน</h1>
+  <p>แตะการ์ดเพื่อพลิก · ฟังเสียงได้ทั้งสองด้าน</p>
+</header>
+
+<div class="stage">
+  <div class="card" id="card">
+    <div class="face front">
+      <div class="pinyin" id="fPinyin">bàodá</div>
+      <button class="speak" id="fSpeak">🔊 ฟังเสียง</button>
+      <div class="hint">แตะเพื่อดูคำศัพท์และคำแปล</div>
+    </div>
+    <div class="face back">
+      <div class="hanzi" id="bHanzi">报答</div>
+      <div class="pinyin-sm" id="bPinyin">bàodá</div>
+      <div class="thai" id="bThai">ตอบแทน, ชดใช้</div>
+      <button class="speak" id="bSpeak">🔊 ฟังอีกครั้ง</button>
+    </div>
+  </div>
+</div>
+
+<div class="bar"><i id="bar"></i></div>
+<div class="count" id="count">1 / 15</div>
+
+<div class="controls" style="margin-top:16px">
+  <button class="ctl" id="prev">← ก่อนหน้า</button>
+  <button class="ctl" id="flip">พลิกการ์ด</button>
+  <button class="ctl" id="next">ถัดไป →</button>
+  <button class="ctl" id="shuffle">🔀 สุ่ม</button>
+  <button class="ctl" id="auto">🔈 ออโต้เสียง</button>
+</div>
+
+<details>
+  <summary>ดูรายการคำศัพท์ทั้งหมด (15 คำ)</summary>
+  <table id="list"></table>
+</details>
+
+<footer>ใช้เสียงอ่านจากระบบของเครื่อง · แนะนำ Chrome / Edge / Safari</footer>
+
+<script>
+const DATA = [
+  {h:"报答", p:"bàodá", t:"ตอบแทน, ชดใช้"},
+  {h:"强健", p:"qiángjiàn", t:"แข็งแรง, แข็งแกร่ง (ร่างกาย)"},
+  {h:"破烂不堪", p:"pòlànbùkān", t:"บุบสลาย, เปื่อยยุ่ย"},
+  {h:"索取", p:"suǒqǔ", t:"เรียกเอา, ขอ (เอา)"},
+  {h:"抚慰", p:"fǔwèi", t:"แสดงความเสียใจและปลอบขวัญ"},
+  {h:"酸楚", p:"suānchǔ", t:"ปวดร้าว ระทมทุกข์"},
+  {h:"虚荣心", p:"xūróngxīn", t:"จิตใจที่ฟุ้งเฟ้อ อยากมีหน้ามีตา"},
+  {h:"忍受", p:"rěnshòu", t:"อดทน"},
+  {h:"悲哀", p:"bēi'āi", t:"เศร้าอาดูร"},
+  {h:"后悔", p:"hòuhuǐ", t:"เศร้า, เสียใจในภายหลัง"},
+  {h:"即兴", p:"jíxìng", t:"เกิดอารมณ์, เกิดแรงบันดาลใจ"},
+  {h:"悲伤", p:"bēishāng", t:"เศร้า, โศกเศร้า"},
+  {h:"回报", p:"huíbào", t:"ตอบแทน (ผลลัพธ์, สังคม)"},
+  {h:"乞丐", p:"qǐgài", t:"ขอทาน"},
+  {h:"自恋", p:"zìliàn", t:"หลงตัวเอง"}
+];
+
+let order = DATA.map((_,i)=>i);
+let idx = 0, autoSpeak = true;
+
+const card=document.getElementById('card');
+const fP=document.getElementById('fPinyin');
+const bH=document.getElementById('bHanzi'), bP=document.getElementById('bPinyin'), bT=document.getElementById('bThai');
+const bar=document.getElementById('bar'), count=document.getElementById('count');
+
+/* ---------- เสียงอ่าน ---------- */
+let zhVoice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  zhVoice = vs.find(v=>/zh[-_]CN/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang)) || null;
+}
+pickVoice();
+speechSynthesis.onvoiceschanged = pickVoice;
+
+function speak(btn){
+  const text = DATA[order[idx]].h;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='zh-CN'; u.rate=0.75; u.pitch=1;
+    if(zhVoice) u.voice=zhVoice;
+    if(btn){ btn.classList.add('on'); u.onend=()=>btn.classList.remove('on'); u.onerror=()=>btn.classList.remove('on'); }
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- แสดงผล ---------- */
+function render(auto=false){
+  const d = DATA[order[idx]];
+  fP.textContent = d.p;
+  bH.textContent = d.h; bP.textContent = d.p; bT.textContent = d.t;
+  count.textContent = (idx+1)+' / '+DATA.length;
+  bar.style.width = ((idx+1)/DATA.length*100)+'%';
+  if(auto && autoSpeak) setTimeout(()=>speak(document.getElementById('fSpeak')), 350);
+}
+function go(step){
+  card.classList.remove('flip');
+  setTimeout(()=>{ idx=(idx+step+DATA.length)%DATA.length; render(true); },180);
+}
+
+card.addEventListener('click', e=>{
+  if(e.target.classList.contains('speak')) return;
+  card.classList.toggle('flip');
+});
+document.getElementById('fSpeak').onclick = e=>{e.stopPropagation();speak(e.currentTarget)};
+document.getElementById('bSpeak').onclick = e=>{e.stopPropagation();speak(e.currentTarget)};
+document.getElementById('prev').onclick = ()=>go(-1);
+document.getElementById('next').onclick = ()=>go(1);
+document.getElementById('flip').onclick = ()=>card.classList.toggle('flip');
+document.getElementById('shuffle').onclick = ()=>{
+  for(let i=order.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[order[i],order[j]]=[order[j],order[i]];}
+  idx=0; card.classList.remove('flip'); render(true);
+};
+const autoBtn=document.getElementById('auto');
+autoBtn.classList.add('active');
+autoBtn.onclick = ()=>{ autoSpeak=!autoSpeak; autoBtn.classList.toggle('active',autoSpeak); };
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight') go(1);
+  if(e.key==='ArrowLeft') go(-1);
+  if(e.key===' '){ e.preventDefault(); card.classList.toggle('flip'); }
+  if(e.key.toLowerCase()==='s') speak();
+});
+
+/* ---------- ตารางคำศัพท์ ---------- */
+const list=document.getElementById('list');
+DATA.forEach((d,i)=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${d.h}</td><td>${d.p}</td><td>${d.t}</td>`;
+  tr.onclick=()=>{ idx=order.indexOf(i); card.classList.remove('flip'); render(true); window.scrollTo({top:0,behavior:'smooth'}); };
+  list.appendChild(tr);
+});
+
+/* ---------- อนุภาค + สายฝน ---------- */
+const sky=document.getElementById('sky');
+for(let i=0;i<34;i++){
+  const d=document.createElement('div');
+  d.className='dust';
+  const s=Math.random()*5+2;
+  d.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;
+    animation-duration:${14+Math.random()*16}s;animation-delay:${-Math.random()*25}s;
+    opacity:${.15+Math.random()*.35}`;
+  sky.appendChild(d);
+}
+for(let i=0;i<22;i++){
+  const r=document.createElement('div');
+  r.className='rain';
+  r.style.cssText=`left:${Math.random()*100}%;height:${40+Math.random()*70}px;
+    animation-duration:${2.5+Math.random()*3}s;animation-delay:${-Math.random()*5}s`;
+  sky.appendChild(r);
+}
+
+render();
+</script>
+</body>
+</html>
